@@ -1,0 +1,16 @@
+## Chapter 7: CI/CD Pipelines with AWS Developer Tools — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | What are the four standard buildspec.yml phases in AWS CodeBuild? | install, pre_build, build, post_build. Exam tip: 'install' is for dependencies/runtime-versions; 'build' runs the actual compile/test commands; artifacts are NOT a phase — they're a separate top-level key. |
+| 2 | How does CodeBuild know which files to package as the output artifact? | Top-level 'artifacts' key in buildspec.yml (files, base-directory, discard-paths) — NOT a phase. Exam trap: students assume post_build automatically uploads output. |
+| 3 | AppSpec.yml lifecycle hook order for EC2/on-premises deployments? | ApplicationStop → DownloadBundle → BeforeInstall → Install → AfterInstall → ApplicationStart → ValidateService. Exam tip: DownloadBundle and Install are reserved for the CodeDeploy agent — you don't script them. |
+| 4 | AppSpec.yml lifecycle hooks for AWS Lambda deployments? | Only two: BeforeAllowTraffic and AfterAllowTraffic. Exam tip: used to invoke validation Lambda functions before/after canary or linear traffic shifting. |
+| 5 | How does CodePipeline pass artifacts between Source, Build, Test, and Deploy stages? | Via Amazon S3 — each stage's output artifact is stored in the pipeline's S3 artifact bucket and pulled as input by the next stage. |
+| 6 | CodeDeploy deployment types for EC2/on-premises vs Lambda? | EC2/on-prem: In-place or Blue/Green. Lambda: Blue/Green only, using traffic-shifting configs (Canary, Linear, AllAtOnce) — no in-place option for Lambda. |
+| 7 | Example CodeDeploy Lambda traffic-shifting deployment config name? | LambdaCanary10Percent5Minutes — shifts 10% traffic, waits 5 minutes, then shifts remaining 90%. Others: LambdaLinear10PercentEvery1Minute, LambdaAllAtOnce. |
+| 8 | What package types does AWS CodeArtifact support? | npm, pip (Python), Maven, NuGet, generic, and Swift packages. Exam tip: CodeArtifact is for dependency/package storage, NOT source code (that's CodeCommit or a Git provider). |
+| 9 | Is AWS CodeCommit available for new customers in 2026? | No — as of mid-2024, AWS CodeCommit stopped onboarding new customers. Existing customers can continue using it. Exam tip: verify current docs, but new-project questions should point to a different source provider. |
+| 10 | Which CodePipeline stages are considered core/standard in a typical exam scenario? | Source → Build → Test (optional) → Deploy. Each stage contains one or more Actions; each action produces/consumes artifacts. |
+| 11 | What does the AppSpec.yml 'hooks' section do for EC2 deployments vs. what does the AppSpec.yml 'Resources' section do for Lambda? | EC2: 'hooks' maps lifecycle event names to scripts to run. Lambda: 'Resources' section defines the function version, alias, and current/target version weights for traffic shifting — no 'files' section needed since there's no OS filesystem to manage. |
+| 12 | Where must the AppSpec.yml file live for a CodeDeploy deployment to succeed? | At the root of the revision (the artifact bundle CodeDeploy pulls, whether from S3, GitHub, or a CodePipeline stage). Exam trap: missing or misplaced AppSpec.yml causes deployment failure with no auto-generation fallback. |

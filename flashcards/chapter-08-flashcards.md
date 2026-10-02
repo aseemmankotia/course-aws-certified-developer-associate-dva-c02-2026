@@ -1,0 +1,16 @@
+## Chapter 8: Infrastructure as Code: AWS CloudFormation, SAM, and CDK — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | SAM Transform declaration — exact value? | Transform: AWS::Serverless-2016-10-31 — required at the top of a SAM template to enable simplified resource types like AWS::Serverless::Function. Exam tip: without it, SAM resource types are invalid CloudFormation resources. |
+| 2 | Ref vs Fn::GetAtt — core difference? | Ref returns a resource's default value (often ID/name, e.g. S3 bucket name). Fn::GetAtt returns a SPECIFIC named attribute (e.g., Arn, DomainName). Exam tip: !GetAtt MyBucket.Arn ≠ !Ref MyBucket. |
+| 3 | Fn::ImportValue behavior when a value is still in use? | CloudFormation BLOCKS deleting or changing an exported Output while any other stack still imports it via Fn::ImportValue. Exam tip: must remove the dependent import first. |
+| 4 | CloudFormation template size limits | 51,200 bytes (~50KB) for direct/inline template upload; 1,048,576 bytes (1MB) when uploaded via S3. Exam tip: large templates → upload via S3 or split via nested stacks. |
+| 5 | Change set workflow (CLI order)? | 1) create-change-set  2) describe-change-set (review Add/Modify/Remove)  3) execute-change-set. Exam tip: change set does NOT apply changes until step 3. |
+| 6 | Nested stack resource type & max depth | AWS::CloudFormation::Stack (references child template via TemplateURL). Max nesting depth = 5 levels. Exam tip: used for modular, reusable infrastructure within ONE root stack deployment. |
+| 7 | CloudFormation vs SAM vs CDK — one-line distinction | CloudFormation = declarative YAML/JSON, full control. SAM = CloudFormation extension (via Transform) simplifying serverless resources. CDK = imperative code (TS/Python/Java) that SYNTHESIZES to a CloudFormation template. Exam tip: CDK doesn't replace CFN — 'cdk synth' outputs a CFN template. |
+| 8 | Fn::Sub vs Fn::Join — when to prefer which? | Fn::Sub embeds variables inline for readability: !Sub 'arn:aws:s3:::${BucketName}'. Fn::Join concatenates an array with a delimiter: !Join ['', [...]]. Exam tip: Fn::Sub also supports ${Resource.Attribute} for GetAtt-style references inside a string. |
+| 9 | Cross-stack Export naming rule | Export Name must be unique within a region + account. Exam tip: exports are how one stack's Outputs become importable via Fn::ImportValue in another stack. |
+| 10 | Default CloudFormation stack limits | 500 resources per stack (default), 200 parameters, 200 outputs, 200 mappings/conditions. Exam tip: exceeding resource count → use nested stacks to split the template. |
+| 11 | CDK core building blocks | App = root of the CDK application. Stack = maps 1:1 to a CloudFormation stack. Construct = reusable cloud component (L1 = raw CFN resource, L2 = curated with defaults, L3 = full pattern). Exam tip: 'cdk deploy' runs synth internally then creates/updates the CFN stack. |
+| 12 | Cost of using CloudFormation, SAM, or CDK | All three are FREE to use — you only pay for the underlying AWS resources they provision (Lambda, DynamoDB, EC2, etc.). Exam tip: don't confuse IaC tooling cost with resource cost in cost-optimization scenario questions. |

@@ -1,0 +1,16 @@
+## Chapter 4: Amazon S3 and Application Integration: SQS, SNS, EventBridge, Step Functions — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | S3 multipart upload: min/max part size and max number of parts? | Min 5MB per part (except last part), max 5GB per part, max 10,000 parts, max total object size 5TB. Exam tip: use multipart for objects >100MB; required above 5GB. |
+| 2 | Maximum expiration time for an S3 presigned URL (SigV4)? | 7 days (604,800 seconds) maximum, regardless of credential type. If using STS temporary credentials, the URL also expires when those credentials expire — whichever is sooner. |
+| 3 | Max size of a single SQS message body? | 256 KB. For larger payloads, use the Amazon SQS Extended Client Library to store the payload in S3 and pass a reference in the message. |
+| 4 | SQS FIFO queue throughput: without batching vs with batching? | 300 msg/sec (or API calls/sec) without batching; 3,000 msg/sec with batching (10 messages/batch). High Throughput FIFO mode removes the per-API-call limit for even higher throughput. |
+| 5 | SQS visibility timeout: default and maximum? | Default 30 seconds, maximum 12 hours. Exam tip: if consumer processing time > visibility timeout, message becomes visible again and may be processed twice — extend timeout with ChangeMessageVisibility. |
+| 6 | SQS message retention period: default and max? | Default 4 days, configurable from 1 minute to 14 days maximum. |
+| 7 | SQS long polling maximum wait time? | 20 seconds (WaitTimeSeconds max). Long polling reduces empty responses and cost vs short polling. |
+| 8 | SQS vs SNS vs EventBridge — when to use each? | SQS: point-to-point decoupling, one consumer per message (competing consumers). SNS: pub/sub fan-out, push to multiple subscriber types (SQS, Lambda, HTTP, email). EventBridge: content-based event routing/filtering across many AWS/partner sources with schema support and custom event buses. |
+| 9 | Step Functions Standard vs Express Workflows? | Standard: exactly-once execution, up to 1 year duration, priced per state transition, full execution history in console — for long-running/auditable workflows. Express: at-least-once (async) or at-most-once (sync), max 5 minutes duration, priced per execution+duration+memory — for high-volume, short-duration event processing. |
+| 10 | Fan-out pattern architecture: how is it built with SNS? | One publisher sends to an SNS topic; multiple SQS queues (and/or Lambda, HTTP endpoints) subscribe independently. Each subscriber gets its own copy of every message, enabling decoupled, parallel processing by multiple independent systems. |
+| 11 | What is exponential backoff with jitter and why does the exam test it? | A retry strategy that increases wait time exponentially between retries (e.g., 1s, 2s, 4s, 8s) plus a randomized jitter to avoid thundering-herd retries hitting the service simultaneously. AWS SDKs implement this by default for throttled/failed API calls — exam tests recognizing it as the correct fix for repeated throttling errors (e.g., SQS/DynamoDB ProvisionedThroughputExceeded). |
+| 12 | Generate an S3 presigned URL via AWS CLI — command? | `aws s3 presign s3://my-bucket/my-key --expires-in 3600` Exam tip: `--expires-in` is in seconds, max allowed value is 604800 (7 days). |

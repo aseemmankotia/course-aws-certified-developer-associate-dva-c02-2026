@@ -1,0 +1,16 @@
+## Chapter 10: Observability: Amazon CloudWatch and AWS X-Ray — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | X-Ray annotations vs metadata — which is indexed and searchable? | Annotations (simple key-value: string/number/boolean) are indexed and filterable via GetTraceSummaries/console search. Metadata (can be complex objects) is NOT indexed — for extra debug context only. Exam tip: if the question says 'filter/search traces by field', the answer is annotations. |
+| 2 | How long does AWS X-Ray retain trace data? | 30 days. Export traces before then if you need longer retention. Exam tip: X-Ray is not a long-term audit store. |
+| 3 | Default X-Ray sampling rule | 1 request/second reservoir, plus 5% of any additional requests per second. Exam tip: you can override with custom sampling rules to sample more/less. |
+| 4 | X-Ray trace ID format | 1-{8 hex digit epoch timestamp}-{24 hex digit unique identifier}, e.g. 1-5759e988-bd862e3fe1be46a994272793. Exam tip: recognize this format in question code snippets. |
+| 5 | Max dimensions allowed per CloudWatch metric | 30 dimensions per metric. Exceeding this in PutMetricData causes a validation error. Exam tip: dimensions define uniqueness of a metric stream — different dimension values = different metric. |
+| 6 | CloudWatch metric data point retention (1-min, 5-min, 1-hour) | 1-minute datapoints: 15 days. 5-minute datapoints: 63 days. 1-hour datapoints: 455 days (15 months). Older data is progressively aggregated then expired. Exam tip: don't assume raw resolution is kept forever. |
+| 7 | How to publish a high-resolution (1-second) custom metric? | In PutMetricData, set StorageResolution=1 (default is 60 = standard resolution). Exam tip: high-resolution metrics cost more and enable sub-minute alarms. |
+| 8 | Max metric data structures per single PutMetricData call | Up to 1000 metric data entries per API call (increased from the older limit of 20). Exam tip: batching reduces API call volume/cost. |
+| 9 | CloudWatch Logs Insights basic query syntax to count errors grouped by field | `fields @timestamp, @message \| filter @message like /ERROR/ \| stats count(*) by requestId \| sort count(*) desc`. Exam tip: know fields, filter, stats...by, sort, limit as core commands. |
+| 10 | X-Ray SDK: how do you add a searchable field vs a debug-only field to a segment? | `segment.put_annotation('customer_id', '123')` → indexed/searchable. `segment.put_metadata('debug_info', {...})` → not indexed, viewable in trace detail only. Exam tip: exam distinguishes these two calls directly. |
+| 11 | Composite alarms — what problem do they solve? | Combine multiple existing CloudWatch alarms using AND/OR/NOT logic (e.g., ALARM(a) AND ALARM(b)) to reduce alarm noise and only notify when multiple conditions occur together. Exam tip: composite alarms reference other alarms, not raw metrics. |
+| 12 | How does the X-Ray SDK send trace data from an application/Lambda to AWS? | The SDK sends UDP segment documents to the X-Ray daemon (or Lambda's built-in X-Ray extension) listening on port 2000, which batches and forwards them to the X-Ray API. Exam tip: enabling 'Active Tracing' on a Lambda function handles this automatically — no daemon setup needed. |

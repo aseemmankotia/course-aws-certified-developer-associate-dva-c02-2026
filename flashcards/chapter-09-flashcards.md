@@ -1,0 +1,16 @@
+## Chapter 9: Deployment Strategies, Elastic Beanstalk, and Containers — Flashcards
+
+| # | Front (Question) | Back (Answer) |
+|---|-----------------|---------------|
+| 1 | CodeDeploy canary preset example and what it does? | Canary10Percent5Minutes — shifts 10% of traffic immediately, waits 5 minutes, then shifts remaining 90%. Exam tip: canary presets apply only to Lambda and ECS deployments, not EC2/on-premises. |
+| 2 | CodeDeploy linear preset naming pattern? | LinearXPercentEveryYMinute(s), e.g., Linear10PercentEvery1Minute — shifts a fixed % at fixed time intervals until 100%. Exam tip: linear = steady incremental shifts, canary = one jump then wait. |
+| 3 | Max Lambda versions a single alias can route weighted traffic across? | Exactly 2 (primary + secondary with assigned weight). Exam tip: used for canary releases without needing CodeDeploy, but CodeDeploy automates the shifting + rollback. |
+| 4 | Elastic Beanstalk deployment policy that doubles capacity temporarily and enables instant rollback via termination? | Immutable. Launches a full new ASG of instances, health-checks them, then swaps traffic. Rollback = terminate new instances. Exam tip: safest but most expensive EB policy. |
+| 5 | Elastic Beanstalk 'Rolling with additional batch' vs 'Rolling'? | Rolling: updates existing capacity in batches (temporary capacity reduction). Rolling with additional batch: launches one extra batch FIRST to maintain full capacity throughout deployment. Exam tip: 'additional batch' = no capacity dip. |
+| 6 | Elastic Beanstalk 'All at once' deployment policy tradeoff? | Fastest deployment, but causes downtime — updates all instances simultaneously with no rollback safety net. Exam tip: never chosen when zero-downtime is a requirement. |
+| 7 | Fargate vs EC2 launch type for ECS — key differentiator? | Fargate: serverless, pay per vCPU/memory-second of running tasks, no instance management. EC2: you manage/pay for instances continuously, needed for GPU workloads, custom AMIs, or instance-level storage/networking control. |
+| 8 | What is Amazon ECR used for? | Fully managed Docker/OCI container image registry integrated with ECS/EKS. Supports lifecycle policies to auto-expire old/untagged images. Exam tip: often paired with ECS task definitions referencing an ECR image URI. |
+| 9 | Are ECS task definitions mutable? | No — task definitions are immutable; updating settings creates a new revision (e.g., myapp:2). Services reference a specific revision and can be updated to roll to a new one. |
+| 10 | How does blue/green rollback differ from rolling deployment rollback? | Blue/green: instant rollback by redirecting traffic back to the untouched original environment. Rolling: instances already updated in place, so rollback requires re-deploying the old version batch by batch — slower. |
+| 11 | CodeDeploy deployment configs for EC2/On-Premises in-place deployments? | CodeDeployDefault.OneAtATime, HalfAtATime, AllAtOnce. Exam tip: these are distinct from the Canary/Linear presets used for Lambda and ECS deployments — don't mix them up. |
+| 12 | In-place deployment rollback characteristic? | Instances are updated directly; rollback requires redeploying the previous application revision to the same instances — no separate environment to fall back to, making rollback slower than blue/green. |
